@@ -2,6 +2,7 @@
 // call truc tiep den api
 
 import { authApis } from '@/apis/auth.api'
+import { readerApis } from '@/apis/reader.api'
 import { userApis } from '@/apis/user.api'
 import { useAuthStore } from '@/stores/auth.store'
 import type { LoginRequest } from '@/types/auth.type'
@@ -10,7 +11,7 @@ import { useNavigate } from 'react-router-dom'
 
 export const useLogin = () => {
 	const navigate = useNavigate()
-	const { setToken, setUser, clearAuth } = useAuthStore()
+	const { setToken, setUser, clearAuth, setReader } = useAuthStore()
 
 	const result = useMutation({
 		mutationKey: ['login'],
@@ -23,16 +24,14 @@ export const useLogin = () => {
 		onSuccess: async (data) => {
 			try {
 				const userInfo = await userApis.getInfoCurrentUser(data.access_token)
-				console.log(data)
-
-				if (userInfo.role !== 'admin') {
-					clearAuth()
-					alert('Chỉ admin mới có thể đăng nhập!')
-					navigate('/login')
-					return
-				}
 				setToken(data.access_token)
 				setUser(userInfo)
+				try {
+					const reader = await readerApis.getReaderByUserId(userInfo.id)
+					setReader(reader)
+				} catch (err: any) {
+					console.log(err)
+				}
 				navigate('/')
 			} catch (error) {
 				clearAuth()

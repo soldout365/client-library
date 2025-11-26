@@ -9,31 +9,28 @@ export type UserType = {
 	createdAt: string
 	updatedAt: string
 }
+export interface UpdateUserPayload {
+	username?: string
+	email?: string
+}
 
-export interface CurrentUserResponse {
+export type RegisterUserRequest = {
+	userCode: string // ví dụ: GV001, SV20020001, NV001
+	username: string
+	password: string
+	email: string
+	role: 'reader' | 'admin'
+	accountStatus: 'active' | 'suspended' | 'banned'
+}
+
+export type RegisterUserResponse = {
 	id: string
-	userCode: string
+	userCode: string // ví dụ: GV001, SV20020001, NV001
 	username: string
 	email: string
-	role: 'admin' | 'reader'
+	role: 'reader' | 'admin'
 	accountStatus: 'active' | 'suspended' | 'banned'
-	lastLogin: string
-	createdAt: string
-	updatedAt: string
-}
-
-export interface UpdateUserRequest {
-	username?: string
-	userCode?: string
-}
-export interface UpdateUserInfoForm {
-	fullName: string
-	userCode: string
-	email: string
-	gender: string
-	dob: string
-	phone: string
-	address: string
-	cardIssueDate: string
-	cardExpiryDate: string
+	lastLogin: string // ISO date
+	createdAt: string // ISO date
+	updatedAt: string // ISO date
 }

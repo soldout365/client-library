@@ -6,11 +6,9 @@ import ChangePassPage from './pages/authentication/change-password/page'
 import ForgotPassPage from './pages/authentication/forgot-password/page'
 import ResetPassPage from './pages/authentication/reset-password/page'
 import Dashboard from './pages/home/home'
-import BooksManagement from './pages/home/manage-book/page'
-import ReadersManagement from './pages/home/manage-reader/page'
-import BorrowManagement from './pages/home/manage-borrow/page'
-import DashboardOverview from './pages/home/overview/page'
-import UserInfoPage from './pages/home/user-info/page'
+
+import UserInfoPage from './pages/user-info/page'
+import RegisterPage from './pages/register/page'
 const routes = createBrowserRouter([
 	{
 		path: '/login',
@@ -52,6 +50,10 @@ const routes = createBrowserRouter([
 				<UserInfoPage />
 			</PrivateRouter>
 		)
+	},
+	{
+		path: '/register',
+		element: <RegisterPage></RegisterPage>
 	}
 ])
 export default routes

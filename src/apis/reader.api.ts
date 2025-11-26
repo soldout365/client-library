@@ -1,14 +1,14 @@
 import axiosInstance from '@/configs/instance'
-import type { ReaderType, UpdateReaderRequest } from '@/types/reader.type'
+import type { Reader, UpdateInfoReaderByIdRequest } from '@/types/reader.type'
+import { string } from 'zod'
 
 export const readerApis = {
-	getReaderByUserId: async (userId: string): Promise<ReaderType> => {
+	getReaderByUserId: async (userId: string) => {
 		const res = await axiosInstance.get(`/readers/user/${userId}`)
 		return res.data
 	},
-
-	updateReader: async (readerId: string, data: UpdateReaderRequest): Promise<ReaderType> => {
-		const res = await axiosInstance.put(`/readers/${readerId}`, data)
+	updateInfoReaderById: async (id: string, payload: UpdateInfoReaderByIdRequest): Promise<Reader> => {
+		const res = await axiosInstance.patch(`/readers/${id}`, payload)
 		return res.data
 	}
 }

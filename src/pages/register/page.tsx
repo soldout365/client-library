@@ -5,46 +5,113 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLogin } from '@/hooks/auth/useLogin'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
+import { useRegisterUser } from '@/hooks/user/useRegisterUser'
 
-const loginFormSchema = z.object({
-	username: z.string().min(2, {
-		message: 'Username must be at least 2 characters.'
+import { useCreateReaderForUser } from '@/hooks/user/useCreateReaderForUser'
+import type { CreateReaderRequest } from '@/types/reader.type'
+
+export const registerSchema = z.object({
+	userCode: z.string().regex(/^(GV\d{3}|NV\d{3}|SV\d{8})$/, {
+		message: 'userCode phải là GV + 3 số, NV + 3 số hoặc SV + 8 số'
 	}),
-	password: z.string().min(6, {
-		message: 'Mật khẩu phải có ít nhất 6 ký tự.'
-	})
+	username: z.string().min(3, 'username tối thiểu 3 ký tự').max(50),
+	password: z.string().min(6, 'password tối thiểu 6 ký tự'),
+	email: z.string().email('Email không hợp lệ'),
+	role: z.enum(['reader', 'admin']),
+	accountStatus: z.enum(['active', 'suspended', 'banned']),
+	cardIssueDate: z.string().min(1),
+	cardExpiryDate: z.string().min(1)
 })
+type RegisterSchemaType = z.infer<typeof registerSchema>
 
-const LoginPage = () => {
+const RegisterPage = () => {
+	const { registerUserAsync } = useRegisterUser()
+
 	const [showPass, setShowPass] = useState(false)
+
+	const currentYear = new Date().getFullYear()
+
+	const { createReaderForUserAsync } = useCreateReaderForUser()
 
 	const { mutate: login, isPending, error } = useLogin()
 
 	// 1. Define your form.
-	const form = useForm<z.infer<typeof loginFormSchema>>({
-		resolver: zodResolver(loginFormSchema),
+	const form = useForm<RegisterSchemaType>({
+		resolver: zodResolver(registerSchema),
 		defaultValues: {
+			userCode: '',
 			username: '',
-			password: ''
+			password: '',
+			email: '',
+			role: 'reader',
+			accountStatus: 'active',
+			cardIssueDate: (() => {
+				return `${currentYear}-09-02`
+			})(),
+			cardExpiryDate: (() => {
+				return `${currentYear + 3}-05-30`
+			})()
 		}
 	})
 
+	//watch
+	const watchRole = form.watch('role')
+	const watchCardIssueDate = form.watch('cardIssueDate')
+	useEffect(() => {
+		if (watchCardIssueDate) {
+			const issueDate = new Date(watchCardIssueDate)
+			console.log(issueDate)
+			form.setValue('cardExpiryDate', `${issueDate.getFullYear() + 3}-05-30`)
+		}
+	}, [watchCardIssueDate, form])
+
 	// 2. Define a submit handler.
-	const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
-		login(
+	const onSubmit = async (values: RegisterSchemaType) => {
+		registerUserAsync(
 			{
+				userCode: values.userCode,
 				username: values.username,
-				password: values.password
+				password: values.password,
+				email: values.email,
+				role: values.role,
+				accountStatus: values.accountStatus
 			},
+
 			{
-				onError: () => toast.error('Đăng nhập thất bại !')
+				onSuccess: (res) => {
+					const payloadCreateReader: CreateReaderRequest = {
+						fullName: res.username,
+						cardNumber: res.userCode,
+						// cardIssueDate: values.cardIssueDate,
+						// cardExpiryDate: values.cardIssueDate,
+						readerTypeName: 'student',
+						dob: new Date().toISOString().split('T')[0],
+						gender: 'male',
+						address: '',
+						phone: ''
+					}
+					if (values.role === 'reader') {
+						payloadCreateReader.cardIssueDate = values.cardIssueDate
+						payloadCreateReader.cardExpiryDate = values.cardExpiryDate
+					}
+					createReaderForUserAsync({ userId: res.id, payload: payloadCreateReader }).catch((error) => {
+						toast.error('tạo reader ko thành công')
+						console.log(error)
+					})
+				},
+				onError: () => toast.error('Đăng ki thất bại !')
 			}
 		)
 	}
+
+	useEffect(() => {
+		form.setValue('accountStatus', 'active')
+		form.setValue('role', 'reader')
+	}, [form])
 
 	return (
 		<div
@@ -100,7 +167,7 @@ const LoginPage = () => {
 							</svg>
 						</div>
 						<h1 className='text-2xl font-bold text-gray-800 leading-tight'>
-							Đăng nhập quản lý
+							Đăng ki quản lý
 							<br />
 							thư viện
 						</h1>
@@ -118,6 +185,28 @@ const LoginPage = () => {
 
 						<Form {...form}>
 							<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+								{/* UserCode */}
+								<FormField
+									control={form.control}
+									name='userCode'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className='text-sm font-semibold text-gray-700'>
+												Mã người dùng
+											</FormLabel>
+											<FormControl>
+												<Input
+													placeholder='Nhập mã...'
+													{...field}
+													disabled={isPending}
+													className='h-12 border-amber-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 bg-white/80 backdrop-blur-sm'
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								{/* Username */}
 								<FormField
 									control={form.control}
 									name='username'
@@ -138,6 +227,7 @@ const LoginPage = () => {
 										</FormItem>
 									)}
 								/>
+								{/* Password */}
 								<FormField
 									control={form.control}
 									name='password'
@@ -169,14 +259,139 @@ const LoginPage = () => {
 										</FormItem>
 									)}
 								/>
+								{/* Email */}
+								<FormField
+									control={form.control}
+									name='email'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className='text-sm font-semibold text-gray-700'>Email</FormLabel>
+											<FormControl>
+												<Input
+													placeholder='Nhập email...'
+													{...field}
+													disabled={isPending}
+													className='h-12 border-amber-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 bg-white/80 backdrop-blur-sm'
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								{/* Role Dropdown */}
+								<FormField
+									control={form.control}
+									name='role'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className='text-sm font-semibold text-gray-700'>
+												Quyền (Role)
+											</FormLabel>
+											<FormControl>
+												<select
+													{...field}
+													disabled={isPending}
+													className='w-full h-12 px-3 rounded-lg border border-amber-200 bg-white/80 focus-visible:ring-amber-500 focus-visible:border-amber-500'
+												>
+													<option value='reader'>Người đọc</option>
+													<option value='admin'>Quản trị viên</option>
+												</select>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								{/* Account Status Dropdown */}
+								<FormField
+									control={form.control}
+									name='accountStatus'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className='text-sm font-semibold text-gray-700'>
+												Trạng thái tài khoản
+											</FormLabel>
+											<FormControl>
+												<select
+													{...field}
+													disabled={isPending}
+													className='w-full h-12 px-3 rounded-lg border border-amber-200 bg-white/80 focus-visible:ring-amber-500 focus-visible:border-amber-500'
+												>
+													<option value='active'>Hoạt động</option>
+													<option value='suspended'>Tạm khóa</option>
+													<option value='banned'>Cấm</option>
+												</select>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								{/* Card Issue Date */}
+								{watchRole === 'reader' && (
+									<>
+										{/* Card Issue Date */}
+										<FormField
+											control={form.control}
+											name='cardIssueDate'
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel className='text-sm font-semibold text-gray-700'>
+														Ngày cấp thẻ
+													</FormLabel>
+													<FormControl>
+														<Input
+															type='date'
+															{...field}
+															disabled={isPending}
+															className='h-12 border-amber-200 focus-visible:ring-amber-500 focus-visible:border-amber-500 bg-white/80 backdrop-blur-sm'
+															onChange={(e) => {
+																field.onChange(e)
+																const issue = new Date(e.target.value)
+																const expiry = new Date(issue)
+																expiry.setFullYear(issue.getFullYear() + 3)
+																expiry.setDate(expiry.getDate() - 1)
+																form.setValue(
+																	'cardExpiryDate',
+																	expiry.toISOString().split('T')[0]
+																)
+															}}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
 
-								{/* Submit Button */}
+										{/* Card Expiry Date */}
+										<FormField
+											control={form.control}
+											name='cardExpiryDate'
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel className='text-sm font-semibold text-gray-700'>
+														Ngày hết hạn
+													</FormLabel>
+													<FormControl>
+														<Input
+															type='date'
+															{...field}
+															readOnly
+															disabled={isPending}
+															className='h-12 border-amber-200 bg-gray-100 cursor-not-allowed text-gray-600'
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									</>
+								)}
+								{/* Submit */}
 								<Button
 									type='submit'
 									disabled={isPending}
 									className='w-full h-12 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold transition-all duration-200 shadow-lg shadow-amber-200 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed'
 								>
-									{isPending ? 'Đang đăng nhập...' : 'Đăng nhập'}
+									{isPending ? 'Đang đăng ký...' : 'Đăng ký'}
 								</Button>
 							</form>
 						</Form>
@@ -190,17 +405,6 @@ const LoginPage = () => {
 									disabled={isPending}
 								>
 									Quên mật khẩu?
-								</button>
-							</div>
-						</Link>
-
-						<Link to='/register'>
-							<div className='text-right mt-1'>
-								<button
-									className='text-sm text-amber-600 hover:text-amber-800 hover:underline transition-colors duration-200 font-medium disabled:opacity-50'
-									disabled={isPending}
-								>
-									Đăng kí ?
 								</button>
 							</div>
 						</Link>
@@ -264,4 +468,4 @@ const LoginPage = () => {
 	)
 }
 
-export default LoginPage
+export default RegisterPage

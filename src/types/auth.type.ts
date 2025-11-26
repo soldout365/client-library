@@ -1,4 +1,4 @@
-import { confirm } from './../lib/validate'
+import type { CreatReaderForUserRespponse } from './reader.type'
 import type { UserType } from './user.type'
 
 export interface LoginResponse {
@@ -13,9 +13,11 @@ export interface LoginRequest {
 export interface AuthState {
 	accessToken: string | null
 	user: UserType | null
+	reader: CreatReaderForUserRespponse | null
 
-	setToken: (token: string) => void
 	setUser: (user: UserType) => void
+	setToken: (token: string) => void
+	setReader: (reader: CreatReaderForUserRespponse) => void
 	clearAuth: () => void
 }
 
