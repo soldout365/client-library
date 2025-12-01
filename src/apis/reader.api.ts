@@ -1,6 +1,5 @@
 import axiosInstance from '@/configs/instance'
 import type { Reader, UpdateInfoReaderByIdRequest } from '@/types/reader.type'
-import { string } from 'zod'
 
 export const readerApis = {
 	getReaderByUserId: async (userId: string) => {

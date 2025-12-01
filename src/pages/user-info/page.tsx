@@ -78,7 +78,9 @@ export default function UserInfoPage() {
 						<button onClick={() => navigate('/')} className='text-gray-600 hover:text-gray-800'>
 							Trang chủ
 						</button>
-						<button className='text-gray-600 hover:text-gray-800'>Tài liệu</button>
+						<button onClick={() => navigate('/documents')} className='text-gray-600 hover:text-gray-800'>
+							Tài liệu
+						</button>
 						<div className='flex items-center gap-2 text-green-600 font-medium'>
 							<User className='w-4 h-4' />
 							<span>{reader?.fullName}</span>

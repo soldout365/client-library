@@ -8,7 +8,11 @@ import ResetPassPage from './pages/authentication/reset-password/page'
 import Dashboard from './pages/home/home'
 
 import UserInfoPage from './pages/user-info/page'
-import RegisterPage from './pages/register/page'
+import RegisterPage from './pages/authentication/register/page'
+import RootLayout from './layouts/RootLayout'
+import DocumentPage from './pages/document/page'
+import ViewAllDocumentPage from './pages/document/view-all-doc/page'
+import BookDetailPage from './pages/document/components/BookDetailPage'
 const routes = createBrowserRouter([
 	{
 		path: '/login',
@@ -36,24 +40,38 @@ const routes = createBrowserRouter([
 		)
 	},
 	{
+		path: '/register',
+		element: <RegisterPage />
+	},
+	{
 		path: '/',
 		element: (
 			<PrivateRouter>
-				<Dashboard />
+				<RootLayout />
 			</PrivateRouter>
-		)
-	},
-	{
-		path: '/user-info',
-		element: (
-			<PrivateRouter>
-				<UserInfoPage />
-			</PrivateRouter>
-		)
-	},
-	{
-		path: '/register',
-		element: <RegisterPage></RegisterPage>
+		),
+		children: [
+			{
+				index: true,
+				element: <Dashboard />
+			},
+			{
+				path: '/user-info',
+				element: <UserInfoPage />
+			},
+			{
+				path: '/documents',
+				element: <DocumentPage />
+			},
+			{
+				path: '/documents/:bookId',
+				element: <BookDetailPage />
+			},
+			{
+				path: '/view-all-documents',
+				element: <ViewAllDocumentPage />
+			}
+		]
 	}
 ])
 export default routes
