@@ -11,13 +11,13 @@ import {
 import type { PaginationMetaType } from '@/types/common.type'
 import { cn } from '@/lib/utils'
 
-interface PagiantionWapperProps {
+interface PaginationWrapperProps {
 	currentMeta?: PaginationMetaType
 	currentData?: number
 	onChangePage: (page: number) => void
 }
 
-const PaginationWrapper = ({ currentMeta, currentData = 0, onChangePage }: PagiantionWapperProps) => {
+const PaginationWrapper = ({ currentMeta, currentData = 0, onChangePage }: PaginationWrapperProps) => {
 	const totalPages = currentMeta?.totalPages || 0
 	const currentPage = currentMeta?.page || 1
 
