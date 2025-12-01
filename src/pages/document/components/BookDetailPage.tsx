@@ -52,7 +52,7 @@ const BookDetailPage = () => {
 					className='mb-4 text-green-600 hover:text-green-700 p-0 h-auto'
 					onClick={() => navigate(-1)}
 				>
-					<ChevronLeft className='w-4 h-4 mr-1' />
+					<ChevronLeft className='w-6 h-6 ml-[-20px]' />
 					Quay lại
 				</Button>
 
@@ -114,8 +114,8 @@ const BookDetailPage = () => {
 					</div>
 
 					{/* Right: Booking Form */}
-					<div className='lg:col-span-8'>
-						<Card>
+					<div className='lg:col-span-8 '>
+						<Card className='h-full'>
 							<CardContent className='p-6'>
 								{/* Thông tin đặt trước sách */}
 								<div className='mb-6'>
