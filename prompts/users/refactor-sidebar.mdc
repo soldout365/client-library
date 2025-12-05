@@ -1,0 +1,166 @@
+---
+alwaysApply: true
+---
+
+đây response khi tôi call api `/api/book-categories/all` thành công:
+
+```json
+[
+	{
+		"id": "f0ee90c4-80ca-41aa-8941-0e799a3af6c1",
+		"name": "Kỹ năng – Hướng nghiệp",
+		"parent_id": null,
+		"parent": null,
+		"createdAt": "2025-09-05T05:00:27.735Z",
+		"updatedAt": "2025-09-05T05:00:27.735Z"
+	},
+	{
+		"id": "7f06b471-b908-4066-8c31-e7b0138eb92b",
+		"name": "Lịch sử – Địa lý – Chính trị – Xã hội",
+		"parent_id": null,
+		"parent": null,
+		"createdAt": "2025-09-05T05:00:19.520Z",
+		"updatedAt": "2025-09-05T05:00:19.520Z"
+	},
+	{
+		"id": "08621695-7b6c-464d-99c0-ee9fdfad9c51",
+		"name": "Sách công nghệ",
+		"parent_id": null,
+		"parent": null,
+		"createdAt": "2025-09-07T09:52:57.073Z",
+		"updatedAt": "2025-09-07T09:52:57.073Z"
+	},
+	{
+		"id": "26a08166-157a-4918-84cc-45c40222c380",
+		"name": "Sách giáo khoa",
+		"parent_id": null,
+		"parent": null,
+		"createdAt": "2025-09-04T10:14:00.482Z",
+		"updatedAt": "2025-09-04T10:14:00.482Z"
+	},
+	{
+		"id": "8505b4b3-7e6f-4577-a816-1e0664afd560",
+		"name": "Sách tham khảo",
+		"parent_id": null,
+		"parent": null,
+		"createdAt": "2025-09-05T04:59:38.371Z",
+		"updatedAt": "2025-09-05T04:59:38.371Z"
+	},
+	{
+		"id": "86fbfff6-e403-4038-b33a-5a5c5a8f3876",
+		"name": "Sách tin học 12",
+		"parent_id": "08621695-7b6c-464d-99c0-ee9fdfad9c51",
+		"parent": {
+			"id": "08621695-7b6c-464d-99c0-ee9fdfad9c51",
+			"name": "Sách công nghệ",
+			"parent_id": null,
+			"createdAt": "2025-09-07T09:52:57.073Z",
+			"updatedAt": "2025-09-07T09:52:57.073Z"
+		},
+		"createdAt": "2025-09-07T09:53:19.708Z",
+		"updatedAt": "2025-09-07T09:53:19.708Z"
+	},
+	{
+		"id": "ed3e6b00-b7e3-48b0-9a47-88faceb0af4c",
+		"name": "SGK lớp 10",
+		"parent_id": "26a08166-157a-4918-84cc-45c40222c380",
+		"parent": {
+			"id": "26a08166-157a-4918-84cc-45c40222c380",
+			"name": "Sách giáo khoa",
+			"parent_id": null,
+			"createdAt": "2025-09-04T10:14:00.482Z",
+			"updatedAt": "2025-09-04T10:14:00.482Z"
+		},
+		"createdAt": "2025-09-04T10:18:02.545Z",
+		"updatedAt": "2025-09-04T10:18:02.545Z"
+	},
+	{
+		"id": "c15936ec-9d10-4f9f-afe2-41acdef3e08d",
+		"name": "SGK lớp 11",
+		"parent_id": "26a08166-157a-4918-84cc-45c40222c380",
+		"parent": {
+			"id": "26a08166-157a-4918-84cc-45c40222c380",
+			"name": "Sách giáo khoa",
+			"parent_id": null,
+			"createdAt": "2025-09-04T10:14:00.482Z",
+			"updatedAt": "2025-09-04T10:14:00.482Z"
+		},
+		"createdAt": "2025-09-04T10:18:08.708Z",
+		"updatedAt": "2025-09-04T10:18:16.796Z"
+	},
+	{
+		"id": "37c37531-ea9d-4ff3-9a73-2b28ed530bb9",
+		"name": "SGK lớp 12",
+		"parent_id": "26a08166-157a-4918-84cc-45c40222c380",
+		"parent": {
+			"id": "26a08166-157a-4918-84cc-45c40222c380",
+			"name": "Sách giáo khoa",
+			"parent_id": null,
+			"createdAt": "2025-09-04T10:14:00.482Z",
+			"updatedAt": "2025-09-04T10:14:00.482Z"
+		},
+		"createdAt": "2025-09-04T10:18:24.657Z",
+		"updatedAt": "2025-09-04T10:18:24.657Z"
+	},
+	{
+		"id": "772eef34-dd41-4838-86e1-4092e6b6cd87",
+		"name": "Văn học - Nghệ thuật",
+		"parent_id": null,
+		"parent": null,
+		"createdAt": "2025-09-05T05:00:06.307Z",
+		"updatedAt": "2025-09-05T05:00:06.307Z"
+	}
+]
+```
+
+khi call được api thành công, hãy xử lý logic convert array thành 1 array mới, sau cho các data có chung parent_id thì sẽ nằm trong parent, kết quả mong muốn sau khi refactor xong là:
+
+```json
+[
+	{
+		"id": "f0ee90c4-80ca-41aa-8941-0e799a3af6c1",
+		"name": "Kỹ năng – Hướng nghiệp",
+		"parent_id": null,
+		"parent": null,
+		"createdAt": "2025-09-05T05:00:27.735Z",
+		"updatedAt": "2025-09-05T05:00:27.735Z"
+	},
+	{
+		"id": "08621695-7b6c-464d-99c0-ee9fdfad9c51",
+		"name": "Sách công nghệ",
+		"parent_id": null,
+		"children": [
+			{
+				"id": "86fbfff6-e403-4038-b33a-5a5c5a8f3876",
+				"name": "Sách tin học 12",
+				"parent_id": "08621695-7b6c-464d-99c0-ee9fdfad9c51",
+				"createdAt": "2025-09-07T09:53:19.708Z",
+				"updatedAt": "2025-09-07T09:53:19.708Z"
+			},
+			...
+		],
+		"createdAt": "2025-09-07T09:52:57.073Z",
+		"updatedAt": "2025-09-07T09:52:57.073Z"
+	},
+	{
+		"id": "26a08166-157a-4918-84cc-45c40222c380",
+		"name": "Sách giáo khoa",
+		"parent_id": null,
+		"children": [
+			{
+				"id": "ed3e6b00-b7e3-48b0-9a47-88faceb0af4c",
+				"name": "SGK lớp 10",
+				"parent_id": "26a08166-157a-4918-84cc-45c40222c380",
+				"createdAt": "2025-09-04T10:18:02.545Z",
+				"updatedAt": "2025-09-04T10:18:02.545Z"
+			},
+			...
+		],
+		"createdAt": "2025-09-04T10:14:00.482Z",
+		"updatedAt": "2025-09-04T10:14:00.482Z"
+	},
+	...
+]
+```
+
+sau khi refactor xong bạn hãy hiện thị sidebar ra màn hình với submenu được render ra từ data refactor

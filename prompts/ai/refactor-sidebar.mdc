@@ -1,0 +1,81 @@
+---
+alwaysApply: true
+---
+
+## Hiểu biết về yêu cầu
+
+API `/api/book-categories/all` trả về một mảng phẳng (flat array) các categories, bao gồm:
+
+- **Parent categories**: có `parent_id === null`
+- **Child categories**: có `parent_id !== null` (trỏ đến parent)
+
+Yêu cầu:
+
+1. **Convert flat array thành tree structure**: Nhóm các child categories vào trong parent categories tương ứng
+2. **Cấu trúc kết quả**: Mảng các parent categories, mỗi parent có property `children` chứa các child categories
+3. **Hiển thị sidebar với submenu**: Render sidebar với khả năng expand/collapse submenu cho các parent categories có children
+
+## Các công việc cần thực hiện
+
+### 1. Tạo utility function để convert flat array thành tree structure
+
+- [ ] Tạo function `convertCategoriesToTree` hoặc tương tự
+- [ ] Function nhận vào mảng phẳng các categories từ API
+- [ ] Logic xử lý:
+    - Lọc ra các parent categories (parent_id === null)
+    - Với mỗi parent, tìm tất cả children có parent_id === parent.id
+    - Gán children vào property `children` của parent
+    - Loại bỏ property `parent` (không cần thiết trong tree structure)
+- [ ] Return mảng các parent categories với children đã được nhóm
+- [ ] Đặt function trong file utility hoặc trong component (tùy theo quy ước dự án)
+
+### 2. Cập nhật CategorySidebar component
+
+- [ ] Sử dụng function convert để transform data từ API
+- [ ] Lưu kết quả đã convert vào state hoặc biến local
+- [ ] Cập nhật logic render để hiển thị tree structure
+- [ ] Xử lý state expand/collapse cho các parent categories có children
+
+### 3. Hiển thị sidebar với submenu
+
+- [ ] Render parent categories như hiện tại
+- [ ] Với các parent có `children`, hiển thị icon expand/collapse (có thể dùng ChevronDown/ChevronUp)
+- [ ] Khi click vào parent category:
+    - Nếu có children: toggle expand/collapse submenu
+    - Nếu không có children: navigate như bình thường
+- [ ] Render submenu (children) khi parent được expand:
+    - Hiển thị children với indentation (padding-left)
+    - Style khác biệt để phân biệt với parent
+    - Click vào child category sẽ navigate với category_id của child
+- [ ] Xử lý active state:
+    - Parent active: khi `currentCategoryId === parent.id`
+    - Child active: khi `currentCategoryId === child.id`
+    - Highlight cả parent và child khi child được chọn
+
+### 4. Xử lý navigation cho parent và child categories
+
+- [ ] Parent category click:
+    - Nếu có children: chỉ toggle expand/collapse, không navigate
+    - Nếu không có children: navigate với parent.id
+- [ ] Child category click:
+    - Luôn navigate với child.id
+    - Đảm bảo URL được cập nhật đúng
+- [ ] Khi URL có `main_category_id`:
+    - Nếu là parent: highlight parent và expand submenu
+    - Nếu là child: highlight child và parent, expand submenu của parent
+
+### 5. UI/UX improvements
+
+- [ ] Thêm animation cho expand/collapse submenu (smooth transition)
+- [ ] Icon chevron xoay khi expand/collapse
+- [ ] Style cho submenu items (indentation, smaller font, different color)
+- [ ] Hover effects cho cả parent và child items
+- [ ] Đảm bảo responsive và scrollable khi có nhiều categories
+
+### 6. Testing và cleanup
+
+- [ ] Kiểm tra với data có nhiều levels (nếu có)
+- [ ] Kiểm tra với parent không có children
+- [ ] Kiểm tra với parent có nhiều children
+- [ ] Đảm bảo không có lỗi linter
+- [ ] Đảm bảo performance tốt với số lượng categories lớn

@@ -1,0 +1,80 @@
+---
+alwaysApply: true
+---
+
+## Hiểu biết về yêu cầu
+
+File `page.tsx` hiện tại có các vấn đề:
+
+1. **Sử dụng template literals cho className**: Nhiều chỗ dùng template literals với điều kiện để tạo className, điều này khó đọc và bảo trì
+2. **Component quá lớn**: File `page.tsx` có 274 dòng với nhiều logic và UI được viết trực tiếp trong component chính
+3. **Thiếu tái sử dụng**: Các phần UI như sidebar, breadcrumb, loading states có thể tách thành components riêng
+
+## Các công việc cần thực hiện
+
+### 1. Refactor className sử dụng `cn()` utility
+
+- [x] Thay thế tất cả template literals cho className bằng hàm `cn()` từ `src/lib/utils.ts`
+- [x] Áp dụng cho các button trong sidebar (category buttons, "Tất cả sách" button)
+- [x] Áp dụng cho ChevronRight icon className
+- [x] Đảm bảo logic điều kiện className vẫn hoạt động đúng
+
+### 2. Tách component Breadcrumb
+
+- [x] Tạo component `DocumentBreadcrumb.tsx` trong `src/pages/document/view-all-doc/components/`
+- [x] Di chuyển logic breadcrumb (lines 100-129) vào component mới
+- [x] Nhận props: `bookType`, `currentCategory`
+- [x] Import và sử dụng trong `page.tsx`
+
+### 3. Tách component Category Sidebar
+
+- [x] Tạo component `CategorySidebar.tsx` trong `src/pages/document/view-all-doc/components/`
+- [x] Di chuyển toàn bộ sidebar logic (lines 132-227) vào component mới
+- [x] Nhận props: `categories`, `isLoading`, `currentCategoryId`, `onCategoryClick`
+- [x] Sử dụng `cn()` cho tất cả className có điều kiện
+- [x] Import và sử dụng trong `page.tsx`
+
+### 4. Tách component Books Grid
+
+- [x] Tạo component `BooksGrid.tsx` trong `src/pages/document/view-all-doc/components/`
+- [x] Di chuyển phần hiển thị books grid và loading state (lines 240-265) vào component mới
+- [x] Nhận props: `books`, `isLoading`, `onChangePage`, `currentMeta`
+- [x] Import và sử dụng trong `page.tsx`
+
+### 5. Cleanup và tối ưu
+
+- [x] Đảm bảo tất cả imports được sắp xếp đúng
+- [x] Kiểm tra không có unused imports
+- [x] Đảm bảo code sau khi refactor vẫn hoạt động như cũ
+- [x] File `page.tsx` sau khi refactor nên ngắn gọn và dễ đọc hơn
+
+## Các công việc tiếp theo (Yêu cầu bổ sung)
+
+### 6. Refactor BooksGrid component - Tự quản lý API và pagination
+
+- [x] Di chuyển logic call API `useBooks` từ `page.tsx` vào `BooksGrid.tsx`
+- [x] Component `BooksGrid` tự đọc query params từ URL bằng `useQueryParams`
+- [x] Xử lý logic `handleChangePage` bên trong `BooksGrid` component
+- [x] Khi URL thay đổi (query params), component tự động call lại API thông qua React Query
+- [x] Component `BooksGrid` không cần nhận props `books`, `isLoading`, `onChangePage`, `currentMeta` nữa
+- [x] Cập nhật `page.tsx` để loại bỏ logic liên quan đến books API và pagination
+
+### 7. Refactor SearchBar component - Tự quản lý search logic
+
+- [x] Di chuyển logic search từ `page.tsx` vào component `SearchBar` (tạo component `DocumentSearchBar.tsx`)
+- [x] Component `DocumentSearchBar` tự quản lý state search value
+- [x] Khi nhấn Enter hoặc click button tìm kiếm, push thông tin tìm kiếm lên URL
+- [x] Component `DocumentSearchBar` đọc query param `q` từ URL để hiển thị giá trị search hiện tại
+- [x] Khi URL thay đổi (query param `q`), component tự động cập nhật search value
+- [x] Cập nhật `page.tsx` để loại bỏ logic search và hook `useSearch`
+- [x] Đảm bảo khi search, URL được cập nhật và `BooksGrid` tự động call lại API với query mới
+
+### 8. Cleanup page.tsx sau khi refactor
+
+- [x] Loại bỏ các imports không cần thiết sau khi di chuyển logic
+- [x] Loại bỏ hook `useBooks` khỏi `page.tsx`
+- [x] Loại bỏ hook `useSearch` khỏi `page.tsx`
+- [x] Loại bỏ function `handleChangePage` khỏi `page.tsx`
+- [x] Đảm bảo `page.tsx` chỉ còn logic quản lý categories và navigation
+- [x] Kiểm tra không có lỗi linter
+- [x] Đảm bảo tất cả chức năng vẫn hoạt động đúng sau khi refactor

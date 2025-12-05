@@ -22,3 +22,7 @@ export type BookCategoryUpdateType = Partial<BookCategoryCreateType>
 export type SearchBookCategoryParamsType = QueryParamsType & {
 	q: string
 }
+
+export type BookCategoryTreeType = Omit<BookCategoryType, 'parent_id'> & {
+	children?: BookCategoryTreeType[]
+}

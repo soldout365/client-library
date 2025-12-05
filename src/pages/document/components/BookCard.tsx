@@ -1,8 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { EBookType, type BookType } from '@/types/book.type'
+import { BookOpen, Calendar, Eye } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen, Eye, Calendar } from 'lucide-react'
 
 interface BookCardProps {
 	book: BookType
@@ -13,7 +13,7 @@ export const BookCard = ({ book }: BookCardProps) => {
 
 	return (
 		<Card
-			className='group overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200/80 hover:border-green-400/60 bg-white'
+			className='overflow-hidden transition-all duration-300 bg-white border cursor-pointer group hover:shadow-lg border-gray-200/80 hover:border-green-400/60'
 			onClick={() => navigate(`/documents/${book.id}`)} // Chuyển trang khi click
 		>
 			{/* Ảnh bìa sách */}
@@ -26,7 +26,7 @@ export const BookCard = ({ book }: BookCardProps) => {
 						'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTh1I_ZbgRygJ-yy2fIIlScWrxTZkGuZXThhA&s'
 					}
 					alt={book.title}
-					className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 '
+					className='object-cover w-full h-full transition-transform duration-300 group-hover:scale-105 '
 				/>
 				{/* Badge loại sách */}
 				<div className='absolute top-2 right-2'>
@@ -53,13 +53,13 @@ export const BookCard = ({ book }: BookCardProps) => {
 				{' '}
 				{/* Giảm padding và spacing */}
 				{/* Tiêu đề */}
-				<h3 className='font-semibold text-gray-900 line-clamp-2 text-sm leading-tight group-hover:text-green-600 mb-3 transition-colors'>
+				<h3 className='mb-3 text-sm font-semibold leading-tight text-gray-900 transition-colors line-clamp-2 group-hover:text-green-600'>
 					{' '}
 					{/* leading-tight để dòng chữ sát hơn */}
 					{book.title}
 				</h3>
 				{/* Tác giả */}
-				<p className='text-xs text-gray-600 line-clamp-1 flex items-center mb-3 gap-1'>
+				<p className='flex items-center gap-1 mb-3 text-xs text-gray-600 line-clamp-1'>
 					{' '}
 					{/* Giảm gap */}
 					<span className='text-gray-400'>✍️</span>

@@ -1,0 +1,14 @@
+---
+alwaysApply: true
+---
+
+bạn hãy sử dụng src/lib/utils.ts để xử lý các logic liên quan đến className cho tôi, sau đó bạn hãy optimize code thành các component và để chúng vào trong src/pages/document/view-all-doc/components
+
+sau khi refactor xong,
+
+- src/pages/document/view-all-doc/components/BooksGrid.tsx
+    - bạn hãy call api lấy danh sách book ở component này
+    - xử lý logic changePage ở component này
+        - khi url thay đổi sẽ tự động call lại api
+- src/pages/document/view-all-doc/page.tsx
+    - bạn hãy sử lý logic search ở trong component `SearchBar`, và khi tìm kiếm (tôi có thể nhấn enter hoặc click vào button tìm kiếm thì sẽ push thông tin tìm kiếm lên url)
