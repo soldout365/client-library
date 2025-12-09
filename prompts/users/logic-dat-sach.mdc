@@ -1,0 +1,151 @@
+---
+alwaysApply: true
+---
+
+mô tả chức năng mượn sách của học sinh
+
+thỏa mãn 3 điều kiện sau mới cho mượn sách
+
+1. kiểm tra xem "reader" có "status" là "active"
+2. kiểm tra "sách(book)" có
+    - "book_type" là
+        - "physical" thì mới hiển thị giao diện mượn sách
+        - "ebook" thì hiển thị giao diện đọc sách
+    - "physical_type" là "borrowable"
+3. check số lượng sách có sẵn totalItems > 0
+
+cách làm từng bước
+bước 1:
+
+- call api `/api/users/me` để lấy ra id của user
+  có response:
+
+```json
+{
+	"id": "f19f51c6-3a20-41ad-aea5-713698dc4a87",
+	"userCode": "PH123456",
+	"username": "Dang Tien Hung update",
+	"email": "dangtienhung.dev@gmail.com",
+	"role": "admin",
+	"accountStatus": "active",
+	"lastLogin": "2025-12-09T14:55:56.129Z",
+	"createdAt": "2025-09-12T20:40:53.825Z",
+	"updatedAt": "2025-12-09T07:55:56.130Z"
+}
+```
+
+kiểm tra accountStatus là active thì mới sử dụng id của user để call api `/api/readers/user/{userId}`
+
+```json
+{
+	"id": "578589fc-3b62-40b5-b1c1-57306a7e2905",
+	"user": {
+		"id": "f19f51c6-3a20-41ad-aea5-713698dc4a87",
+		"username": "Dang Tien Hung update",
+		"email": "dangtienhung.dev@gmail.com"
+	},
+	"readerType": {
+		"id": "4a0862b0-0e2e-4367-9f9f-c4a0fcc653f4",
+		"typeName": "student",
+		"maxBorrowLimit": 2,
+		"borrowDurationDays": 14
+	},
+	"fullName": "Dang Tien Hung update",
+	"dob": null,
+	"gender": "male",
+	"address": null,
+	"phone": null,
+	"cardNumber": "PH123456",
+	"cardIssueDate": "2025-09-01",
+	"cardExpiryDate": "2028-09-01",
+	"isActive": true,
+	"createdAt": "2025-09-12T20:40:53.844Z",
+	"updatedAt": "2025-09-15T05:55:04.085Z"
+}
+```
+
+kiểm tra isActive có là true hay không, kiểm tra thời hạn thẻ của reder còn hạn hay không
+
+sau đó call đến api `/api/borrow-records/status/{status}`
+có params:
+
+- status là "borrowed"
+- readerId là reader id khi call api về
+
+kiêm tra xem totalItems của borrwored records nếu mà lớn hớn maxBorrowLimit thì không được mượn sách
+
+2. dựa vào bookId được lấy trên url xuống http://localhost:5174/documents/2ba532b7-1f59-402b-a8e5-ee1f7f7e5551 để call đến api `/api/books/{id}`
+   response trả về:
+
+```json
+{
+	"id": "2ba532b7-1f59-402b-a8e5-ee1f7f7e5551",
+	"title": "Sách Địa 12 update",
+	"slug": "sach-dia-12-update-e5551",
+	"isbn": "9786047374898",
+	"publish_year": 2025,
+	"edition": "1st",
+	"description": "ádfadsfasdf",
+	"cover_image": "https://res.cloudinary.com/dcwdrvxdg/image/upload/v1758438362/quan-ly-thu-vien-cua-duong/dia-li-12-3.jpg",
+	"language": "Tiếng Việt",
+	"page_count": 1,
+	"book_type": "physical",
+	"physical_type": "borrowable",
+	"publisher_id": "d25dc258-52af-40db-b173-18196a401753",
+	"publisher": {
+		"id": "d25dc258-52af-40db-b173-18196a401753",
+		"publisherName": "Nhà xuất bản Trẻ",
+		"slug": "nha-xuat-ban-tre",
+		"address": "161B Lý Chính Thắng - Quận 3 - Thành phố Hồ Chí Minh",
+		"phone": "0393162898",
+		"email": "nxbtre@hcm.vnn.vn",
+		"website": "http://www.nxbtre.com.vn",
+		"description": null,
+		"isActive": true,
+		"establishedDate": null,
+		"country": "Việt Nam",
+		"createdAt": "2025-09-04T21:42:43.235Z",
+		"updatedAt": "2025-09-04T21:42:43.235Z"
+	},
+	"category_id": null,
+	"category": null,
+	"main_category_id": "7f06b471-b908-4066-8c31-e7b0138eb92b",
+	"mainCategory": {
+		"id": "7f06b471-b908-4066-8c31-e7b0138eb92b",
+		"name": "Lịch sử – Địa lý – Chính trị – Xã hội",
+		"parent_id": null,
+		"createdAt": "2025-09-04T22:00:19.520Z",
+		"updatedAt": "2025-09-04T22:00:19.520Z"
+	},
+	"authors": [
+		{
+			"id": "75dbabcd-8b88-452f-ac8a-995f7718a5a6",
+			"author_name": "Nguyễn Việt Khôi",
+			"slug": "nguyen-viet-khoi",
+			"bio": "Ông có chuyên môn về địa lý kinh tế – xã hội, tham gia xây dựng chương trình và tài liệu dạy học, góp phần phát triển phương pháp giảng dạy Địa lý theo hướng gắn với thực tiễn.",
+			"nationality": "Việt Nam"
+		}
+	],
+	"created_at": "2025-09-21T00:09:17.642Z",
+	"view": 11,
+	"updated_at": "2025-09-24T09:04:16.628Z"
+}
+```
+
+kiểm tra xem
+
+- book_type là "physical" hay "ebook"
+  nếu là ebook thì hiển thị màn hình ebook để học sách
+  nếu là physical thì hiển thị giao diện mượn sách
+- physical_type là "borrowable" thì mới cho mượn sách, nếu mà là "library_use" thì không cho mượn sách, hiển thị alert "sách chỉ được đọc ở thư viện"
+
+3. check số lượng sách có sẵn totalItems > 0
+   call api /api/physical-copies/book/{bookId}/available
+   kiểm tra xem totalItems > 0 nếu có thì hiển thị màn mượn sách, không có thì sẽ hiển thị alert không còn sách để cho mượn
+
+## yêu cầu
+
+- các component sử dụng các component của shadcn: alert, sonner, card, ...
+- định nghĩa ra các enum status trong các type liên quan đến status, isActive, ...
+
+nếu pass qua thì khi người dùng nhấn mượn sách sẽ console ra physical avaliabl đầu tiên trong mảng

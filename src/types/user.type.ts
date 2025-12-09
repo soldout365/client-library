@@ -1,10 +1,16 @@
+export enum EAccountStatus {
+	ACTIVE = 'active',
+	SUSPENDED = 'suspended',
+	BANNED = 'banned'
+}
+
 export type UserType = {
 	id: string
 	userCode: string
 	username: string
 	email: string
 	role: 'admin' | 'reader'
-	accountStatus: 'active' | 'suspended' | 'banned'
+	accountStatus: EAccountStatus
 	lastLogin: string
 	createdAt: string
 	updatedAt: string
@@ -20,7 +26,7 @@ export type RegisterUserRequest = {
 	password: string
 	email: string
 	role: 'reader' | 'admin'
-	accountStatus: 'active' | 'suspended' | 'banned'
+	accountStatus: EAccountStatus
 }
 
 export type RegisterUserResponse = {
@@ -29,7 +35,7 @@ export type RegisterUserResponse = {
 	username: string
 	email: string
 	role: 'reader' | 'admin'
-	accountStatus: 'active' | 'suspended' | 'banned'
+	accountStatus: EAccountStatus
 	lastLogin: string // ISO date
 	createdAt: string // ISO date
 	updatedAt: string // ISO date

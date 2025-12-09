@@ -1,6 +1,13 @@
 import type { QueryParamsType } from './common.type'
 import type { LocationType } from './location.type'
 
+export enum EPhysicalCopyStatus {
+	AVAILABLE = 'available',
+	BORROWED = 'borrowed',
+	RESERVED = 'reserved',
+	MAINTENANCE = 'maintenance'
+}
+
 export type PhysicalCopyQueryParamsType = QueryParamsType
 
 export type PhysicalBook = {
@@ -27,7 +34,7 @@ export type PhysicalBook = {
 		view: number
 	}
 	barcode: string
-	status: string
+	status: EPhysicalCopyStatus
 	current_condition: string
 	condition_details: string
 	purchase_date: string // ISO date string
@@ -41,11 +48,16 @@ export type PhysicalBook = {
 	updated_at: string
 }
 
+export type PhysicalCopyAvailableResponseType = {
+	data: PhysicalBook[]
+	totalItems: number
+}
+
 export type CreatePhysicalBookRes = {
 	id: string
 	book_id: string
 	barcode: string
-	status: string
+	status: EPhysicalCopyStatus
 	current_condition: string
 	condition_details: string
 	purchase_date: string

@@ -1,3 +1,8 @@
+export enum EReaderActiveStatus {
+	ACTIVE = true,
+	INACTIVE = false
+}
+
 export type Reader = {
 	id: string
 	user: {

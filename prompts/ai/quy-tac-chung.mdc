@@ -1,0 +1,275 @@
+---
+alwaysApply: true
+---
+
+## Hiểu biết về quy tắc chung
+
+Dựa vào structure của dự án và các yêu cầu đã được định nghĩa, đây là các quy tắc chung cần tuân thủ khi phát triển dự án.
+
+## 1. Workflow phát triển tính năng mới
+
+Khi làm một tính năng mới, luôn tuân theo thứ tự sau:
+
+1. **Khai báo Types** (hoặc sử dụng types có sẵn)
+    - Đặt trong `src/types/`
+    - File phải có hậu tố `.type.ts`
+    - Ví dụ: `book.type.ts`, `user.type.ts`
+
+2. **Khai báo APIs** (hoặc sử dụng APIs có sẵn)
+    - Đặt trong `src/apis/`
+    - File phải có hậu tố `.api.ts`
+    - Ví dụ: `book.api.ts`, `user.api.ts`
+
+3. **Khai báo Hooks** (hoặc sử dụng hooks có sẵn)
+    - Đặt trong `src/hooks/` theo cấu trúc feature
+    - Ví dụ: `src/hooks/books/useGetBooks.ts`
+    - Sử dụng React Query hoặc custom hooks
+
+4. **Phát triển tính năng**
+    - Sau khi đã có types, APIs, hooks mới bắt đầu phát triển UI và logic
+
+## 2. Quy tắc đặt tên file và folder
+
+### 2.1. Kebab-case (dấu gạch ngang)
+
+**Quy tắc**: Tất cả file và folder phải sử dụng **kebab-case** (chữ thường + dấu gạch ngang)
+
+- ❌ `BookCard.tsx` -> ✅ `book-card.tsx`
+- ❌ `CategorySidebar.tsx` -> ✅ `category-sidebar.tsx`
+- ❌ `UserInfoPage.tsx` -> ✅ `user-info-page.tsx` (hoặc `page.tsx` trong route)
+- ❌ `MyComponent.tsx` -> ✅ `my-component.tsx`
+
+**Áp dụng cho:**
+
+- Tất cả file `.tsx`, `.ts`
+- Tất cả folder
+- Không có ngoại lệ
+
+### 2.2. Hậu tố cho các file trong thư mục đặc biệt
+
+Trong các folder sau, file **bắt buộc** phải có hậu tố tương ứng:
+
+- `src/apis/` → hậu tố `.api.ts`
+    - ✅ `book.api.ts`
+    - ✅ `user.api.ts`
+    - ❌ `book.ts` (thiếu hậu tố)
+
+- `src/types/` → hậu tố `.type.ts`
+    - ✅ `book.type.ts`
+    - ✅ `user.type.ts`
+    - ❌ `book.ts` (thiếu hậu tố)
+
+- `src/stores/` → hậu tố `.store.ts`
+    - ✅ `auth.store.ts`
+    - ❌ `auth.ts` (thiếu hậu tố)
+
+- `src/configs/` → hậu tố `.config.ts` hoặc không có hậu tố (tùy convention)
+    - ✅ `instance.ts` (có thể chấp nhận)
+    - ✅ `app.config.ts` (nếu có nhiều config)
+
+- `src/contexts/` → hậu tố `.context.tsx` hoặc `.context.ts`
+    - ✅ `auth-context.context.tsx`
+    - ❌ `auth-context.tsx` (thiếu hậu tố)
+
+- `src/providers/` → hậu tố `.provider.tsx`
+    - ✅ `theme.provider.tsx`
+
+- `src/services/` → hậu tố `.service.ts`
+    - ✅ `auth.service.ts`
+
+### 2.3. Naming cho Pages
+
+- Tất cả page phải có tên `page.tsx`
+- Không được đặt tên khác như `home.tsx`, `index.tsx`
+- Ví dụ:
+    - ✅ `src/pages/home/page.tsx`
+    - ✅ `src/pages/document/page.tsx`
+    - ❌ `src/pages/home/home.tsx`
+
+### 2.4. Naming cho Components
+
+- Component files: `kebab-case.tsx`
+- Component export names: Giữ nguyên **PascalCase** (chỉ đổi tên file)
+- Ví dụ:
+    - File: `book-card.tsx`
+    - Export: `export const BookCard = ...`
+
+## 3. Cấu trúc Pages và Features
+
+### 3.1. Pages Structure
+
+- Mỗi page nằm trong folder riêng với tên `page.tsx`
+- Pages chỉ chứa logic routing và layout chính
+- Không chứa components (components được tách sang features)
+
+**Cấu trúc:**
+
+```
+src/pages/
+├── feature-name/
+│   └── page.tsx
+└── feature-name/
+    ├── [dynamic-param]/
+    │   └── page.tsx
+    └── page.tsx
+```
+
+### 3.2. Features Structure
+
+**Quy tắc**: Khi làm page mới, **luôn** tạo folder song song trong `features/`
+
+- Structure của `features/` tương ứng với `pages/`
+- Features chỉ chứa: components, hooks, utils, constants của feature đó
+- Pages import từ features, không import từ pages khác
+
+**Cấu trúc:**
+
+```
+src/features/
+├── feature-name/
+│   ├── components/
+│   │   └── component-name.tsx
+│   ├── hooks/
+│   │   └── use-feature-hook.ts
+│   └── utils/
+│       └── feature-utils.ts
+└── feature-name/
+    └── sub-feature/
+        └── components/
+            └── sub-component.tsx
+```
+
+**Ví dụ:**
+
+- Page: `src/pages/document/page.tsx`
+- Feature: `src/features/document/components/book-section.tsx`
+
+- Page: `src/pages/document/view-all-doc/page.tsx`
+- Feature: `src/features/document/view-all-doc/components/books-grid.tsx`
+
+### 3.3. Import Rules
+
+- Pages import từ features: `import { Component } from '@/features/...'`
+- Features có thể import từ:
+    - `@/components/` (shared components)
+    - `@/hooks/` (shared hooks)
+    - `@/types/` (types)
+    - `@/apis/` (APIs)
+    - Các features khác nếu cần
+
+## 4. Quy tắc về className và styling
+
+### 4.1. Sử dụng `cn()` utility
+
+- Luôn sử dụng `cn()` từ `@/lib/utils` để xử lý className có điều kiện
+- Không sử dụng template literals cho className
+
+**Ví dụ:**
+
+```tsx
+// ❌ Không đúng
+className={`base-class ${condition ? 'active' : 'inactive'}`}
+
+// ✅ Đúng
+className={cn('base-class', condition ? 'active' : 'inactive')}
+```
+
+### 4.2. Tailwind CSS
+
+- Sử dụng Tailwind CSS cho styling
+- Ưu tiên utility classes
+- Custom styles chỉ khi cần thiết
+
+## 5. Quy tắc về Component Structure
+
+### 5.1. Component Organization
+
+- Mỗi component nên có một file riêng
+- Component lớn nên được tách thành các sub-components
+- Sử dụng `cn()` cho className có điều kiện
+
+### 5.2. Component Props
+
+- Props interface nên đặt trong cùng file component
+- Naming: `ComponentNameProps`
+- Ví dụ: `BookCardProps`, `CategorySidebarProps`
+
+## 6. Quy tắc về Hooks
+
+### 6.1. Custom Hooks
+
+- Đặt trong `src/hooks/` theo cấu trúc feature
+- Naming: `use-feature-action.ts` hoặc `useFeatureAction.ts` (tùy convention)
+- Ví dụ: `use-get-books.ts` hoặc `useGetBooks.ts`
+
+### 6.2. React Query Hooks
+
+- Sử dụng React Query cho data fetching
+- Hook naming: `useFeatureName` hoặc `use-feature-name`
+- Ví dụ: `useBooks`, `useGetBookById`
+
+## 7. Quy tắc về Routes
+
+### 7.1. Dynamic Routes
+
+- Sử dụng `[param]` cho dynamic routes trong folder structure
+- Ví dụ: `src/pages/document/[bookId]/page.tsx`
+- Route path: `/documents/:bookId`
+
+### 7.2. Route Organization
+
+- Routes được định nghĩa trong `src/routes.tsx`
+- Sử dụng `createBrowserRouter` từ React Router
+- Routes được nhóm theo logic và authentication
+
+## 8. Quy tắc về Imports
+
+### 8.1. Import Order
+
+1. External libraries (React, React Router, etc.)
+2. Internal components (`@/components/`)
+3. Internal hooks (`@/hooks/`)
+4. Internal types (`@/types/`)
+5. Internal APIs (`@/apis/`)
+6. Features (`@/features/`)
+7. Relative imports (`.`, `..`)
+
+### 8.2. Import Path Aliases
+
+- Sử dụng path aliases (`@/`) thay vì relative paths khi có thể
+- Ví dụ:
+    - ✅ `import { Button } from '@/components/ui/button'`
+    - ❌ `import { Button } from '../../../components/ui/button'`
+
+## 9. Quy tắc về Code Quality
+
+### 9.1. TypeScript
+
+- Luôn sử dụng TypeScript
+- Định nghĩa types rõ ràng
+- Tránh sử dụng `any`
+
+### 9.2. Error Handling
+
+- Xử lý errors một cách rõ ràng
+- Sử dụng try-catch khi cần
+- Hiển thị error messages phù hợp cho user
+
+### 9.3. Loading States
+
+- Luôn hiển thị loading state khi fetch data
+- Sử dụng skeleton hoặc spinner phù hợp
+
+## 10. Checklist khi tạo tính năng mới
+
+- [ ] Đã khai báo types trong `src/types/` với hậu tố `.type.ts`
+- [ ] Đã khai báo APIs trong `src/apis/` với hậu tố `.api.ts`
+- [ ] Đã khai báo hooks trong `src/hooks/` (nếu cần)
+- [ ] Đã tạo page trong `src/pages/` với tên `page.tsx`
+- [ ] Đã tạo feature folder song song trong `src/features/`
+- [ ] Đã tách components vào `src/features/` (không để trong pages)
+- [ ] Tất cả file và folder đã tuân thủ kebab-case
+- [ ] Đã sử dụng `cn()` cho className có điều kiện
+- [ ] Đã cập nhật routes trong `src/routes.tsx` (nếu cần)
+- [ ] Đã kiểm tra không có lỗi linter
+- [ ] Đã test tính năng hoạt động đúng

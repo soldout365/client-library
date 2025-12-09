@@ -1,13 +1,14 @@
 # File Tree: client-library
 
-**Generated:** 12/9/2025, 9:18:57 PM
+**Generated:** 12/9/2025, 9:42:55 PM
 **Root Path:** `/Users/dangtienhung/Documents/qltv/client-library`
 
 ```
 ├── 📁 prompts
 │   ├── 📁 ai
 │   │   ├── 📄 fix-ui-view-all-doc.mdc
-│   │   └── 📄 refactor-sidebar.mdc
+│   │   ├── 📄 refactor-sidebar.mdc
+│   │   └── 📄 refactor-structure.mdc
 │   └── 📁 users
 │       ├── 📄 fix-ui-view-all-doc.mdc
 │       ├── 📄 refactor-sidebar.mdc
@@ -38,15 +39,29 @@
 │   │   │   ├── 📄 pagination.tsx
 │   │   │   ├── 📄 sonner.tsx
 │   │   │   └── 📄 switch.tsx
-│   │   ├── 📄 PrivateRouter.tsx
-│   │   ├── 📄 PublicRouter.tsx
 │   │   ├── 📄 header.tsx
 │   │   ├── 📄 pagination-wrapper.tsx
+│   │   ├── 📄 private-router.tsx
+│   │   ├── 📄 public-router.tsx
 │   │   └── 📄 search-bar.tsx
 │   ├── 📁 configs
 │   │   └── 📄 instance.ts
 │   ├── 📁 contexts
 │   │   └── 📄 auth-context.context.tsx
+│   ├── 📁 features
+│   │   ├── 📁 document
+│   │   │   ├── 📁 components
+│   │   │   │   ├── 📄 book-card.tsx
+│   │   │   │   └── 📄 book-section.tsx
+│   │   │   └── 📁 view-all-doc
+│   │   │       └── 📁 components
+│   │   │           ├── 📄 books-grid.tsx
+│   │   │           ├── 📄 category-sidebar.tsx
+│   │   │           ├── 📄 document-breadcrumb.tsx
+│   │   │           └── 📄 document-search-bar.tsx
+│   │   └── 📁 user-info
+│   │       └── 📁 components
+│   │           └── 📄 detail-info.tsx
 │   ├── 📁 hooks
 │   │   ├── 📁 auth
 │   │   │   ├── 📄 useChangePassword.tsx
@@ -76,7 +91,7 @@
 │   │   ├── 📄 useQueryParam.ts
 │   │   └── 📄 useSearch.ts
 │   ├── 📁 layouts
-│   │   └── 📄 RootLayout.tsx
+│   │   └── 📄 root-layout.tsx
 │   ├── 📁 lib
 │   │   ├── 📄 utils.ts
 │   │   └── 📄 validate.ts
@@ -93,29 +108,19 @@
 │   │   │   └── 📁 reset-password
 │   │   │       └── 📄 page.tsx
 │   │   ├── 📁 document
-│   │   │   ├── 📁 components
-│   │   │   │   ├── 📄 BookCard.tsx
-│   │   │   │   ├── 📄 BookDetailPage.tsx
-│   │   │   │   └── 📄 BookSection.tsx
+│   │   │   ├── 📁 [bookId]
+│   │   │   │   └── 📄 page.tsx
 │   │   │   ├── 📁 view-all-doc
-│   │   │   │   ├── 📁 components
-│   │   │   │   │   ├── 📄 BooksGrid.tsx
-│   │   │   │   │   ├── 📄 CategorySidebar.tsx
-│   │   │   │   │   ├── 📄 DocumentBreadcrumb.tsx
-│   │   │   │   │   └── 📄 DocumentSearchBar.tsx
 │   │   │   │   └── 📄 page.tsx
 │   │   │   └── 📄 page.tsx
 │   │   ├── 📁 home
-│   │   │   └── 📄 home.tsx
+│   │   │   └── 📄 page.tsx
 │   │   └── 📁 user-info
-│   │       ├── 📁 components
-│   │       │   └── 📄 detail-info.tsx
 │   │       └── 📄 page.tsx
 │   ├── 📁 stores
 │   │   └── 📄 auth.store.ts
 │   ├── 📁 types
 │   │   ├── 📄 auth.type.ts
-│   │   ├── 📄 author.type copy.ts
 │   │   ├── 📄 author.type.ts
 │   │   ├── 📄 book-category.type.ts
 │   │   ├── 📄 book.type.ts

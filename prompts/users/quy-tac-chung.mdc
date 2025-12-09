@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+đây là structure của dự án: structure.md
+
+dựa vào structure của dự án, bạn sẽ làm theo workflow này:
+khi làm 1 tính năng mới luôn khai báo types, hoặc sử dụng các type có sẵn ở trong src/types,
+sau đó sẽ khai báo apis hoặc sử dụng các api có sẵn trong src/apis
+sau đó sẽ khai báo hooks, hoặc sử dụng hooks tương ứng nếu có sẵn
+sau đó mới phát triển các tính năng theo yêu cầu
+
+## quy tắc đặt tên file/folder
+
+- tên file/folder luôn tuần thủ theo quy tắc đặt tên theo "keyboard-case"
+- trong các folder apis, types, stores, configs, contexts, providers, services luôn luôn có hậu tố ở sau file
+  ex: example.type.ts, example.api.ts, ....
+
+khi làm các page mới luôn sinh ra các folder song song trong features

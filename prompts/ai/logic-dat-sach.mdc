@@ -1,0 +1,267 @@
+---
+alwaysApply: true
+---
+
+## Hiểu biết về yêu cầu
+
+Chức năng mượn sách cho học sinh cần kiểm tra 3 điều kiện chính trước khi cho phép mượn sách:
+
+1. **Kiểm tra Reader Status**: Reader phải có `status` là "active", `isActive` là `true`, và thẻ thư viện còn hạn
+2. **Kiểm tra Book Type và Physical Type**:
+    - `book_type` phải là "physical" để hiển thị giao diện mượn sách (nếu là "ebook" thì hiển thị giao diện đọc sách)
+    - `physical_type` phải là "borrowable" (nếu là "library_use" thì không cho mượn, hiển thị alert)
+3. **Kiểm tra số lượng sách có sẵn**: `totalItems > 0` từ API available physical copies
+
+Ngoài ra cần kiểm tra số lượng sách đang mượn (`borrowed records`) không được vượt quá `maxBorrowLimit` của reader.
+
+## Các công việc cần thực hiện
+
+### 1. Định nghĩa Types và Enums
+
+#### 1.1. Cập nhật `src/types/user.type.ts`
+
+- [ ] Định nghĩa enum `EAccountStatus` với các giá trị: `'active' | 'suspended' | 'banned'`
+- [ ] Đảm bảo type `UserType` sử dụng enum này cho field `accountStatus`
+
+#### 1.2. Cập nhật `src/types/reader.type.ts`
+
+- [ ] Định nghĩa enum `EReaderStatus` hoặc `EReaderActiveStatus` với giá trị `true | false` hoặc `'active' | 'inactive'`
+- [ ] Đảm bảo type `Reader` sử dụng enum này cho field `isActive`
+- [ ] Kiểm tra và cập nhật các field liên quan đến status
+
+#### 1.3. Tạo `src/types/borrow-record.type.ts` (nếu chưa có)
+
+- [ ] Định nghĩa type `BorrowRecordType` với các field:
+    - `id: string`
+    - `readerId: string`
+    - `physicalCopyId: string`
+    - `status: string` (sẽ dùng enum)
+    - `borrowDate: string`
+    - `dueDate: string`
+    - `returnDate: string | null`
+    - `createdAt: string`
+    - `updatedAt: string`
+- [ ] Định nghĩa enum `EBorrowRecordStatus` với các giá trị: `'borrowed' | 'returned' | 'overdue' | 'reserved'`
+- [ ] Định nghĩa type `BorrowRecordQueryParamsType` extends `QueryParamsType` với:
+    - `status?: EBorrowRecordStatus`
+    - `readerId?: string`
+- [ ] Định nghĩa type `BorrowRecordResponseType` extends `PaginationType<BorrowRecordType>`
+
+#### 1.4. Cập nhật `src/types/physical-copies.type.ts`
+
+- [ ] Định nghĩa enum `EPhysicalCopyStatus` với các giá trị: `'available' | 'borrowed' | 'reserved' | 'maintenance'`
+- [ ] Định nghĩa type `PhysicalCopyAvailableResponseType` với:
+    - `data: PhysicalBook[]`
+    - `totalItems: number`
+    - `meta: PaginationMetaType` (nếu cần)
+- [ ] Cập nhật type `PhysicalBook` để sử dụng enum cho field `status`
+
+### 2. Tạo/Cập nhật APIs
+
+#### 2.1. Cập nhật `src/apis/user.api.ts`
+
+- [ ] Đảm bảo API `getInfoCurrentUser` đã có sẵn (đã có)
+
+#### 2.2. Cập nhật `src/apis/reader.api.ts`
+
+- [ ] Đảm bảo API `getReaderByUserId` đã có sẵn (đã có)
+
+#### 2.3. Tạo `src/apis/borrow-record.api.ts` (mới)
+
+- [ ] Tạo function `getBorrowRecordsByStatus`:
+    - Endpoint: `/api/borrow-records/status/{status}`
+    - Params: `status: EBorrowRecordStatus`, `readerId: string`
+    - Return: `Promise<PaginationType<BorrowRecordType>>`
+
+#### 2.4. Cập nhật `src/apis/physical-copies.api.ts`
+
+- [ ] Thêm function `getAvailablePhysicalCopiesByBookId`:
+    - Endpoint: `/api/physical-copies/book/{bookId}/available`
+    - Params: `bookId: string`
+    - Return: `Promise<PhysicalCopyAvailableResponseType>`
+
+### 3. Tạo/Cập nhật Hooks
+
+#### 3.1. Cập nhật `src/hooks/user/useGetInfoCurUser.tsx`
+
+- [ ] Đảm bảo hook đã có sẵn và hoạt động đúng (đã có)
+
+#### 3.2. Cập nhật `src/hooks/reader/useGetReaderByUserId.ts`
+
+- [ ] Đảm bảo hook đã có sẵn và hoạt động đúng (đã có)
+
+#### 3.3. Tạo `src/hooks/borrow-records/useGetBorrowRecordsByStatus.ts` (mới)
+
+- [ ] Tạo hook sử dụng `useQuery` để fetch borrow records theo status và readerId
+- [ ] Query key: `['borrow-records', status, readerId]`
+- [ ] Enabled khi có đủ `status` và `readerId`
+
+#### 3.4. Tạo `src/hooks/physical-copies/useGetAvailablePhysicalCopies.ts` (mới)
+
+- [ ] Tạo hook sử dụng `useQuery` để fetch available physical copies theo bookId
+- [ ] Query key: `['physical-copies', 'available', bookId]`
+- [ ] Enabled khi có `bookId`
+
+### 4. Tạo Logic Validation Component/Hook
+
+#### 4.1. Tạo `src/hooks/books/useBookBorrowValidation.ts` (mới)
+
+- [ ] Tạo custom hook để kiểm tra tất cả điều kiện mượn sách:
+    - Kiểm tra user accountStatus là "active"
+    - Kiểm tra reader isActive là true
+    - Kiểm tra thẻ thư viện còn hạn (cardExpiryDate > today)
+    - Kiểm tra số lượng sách đang mượn không vượt quá maxBorrowLimit
+    - Kiểm tra book_type là "physical"
+    - Kiểm tra physical_type là "borrowable"
+    - Kiểm tra số lượng sách có sẵn > 0
+- [ ] Return object với:
+    - `isValid: boolean`
+    - `canBorrow: boolean`
+    - `errors: string[]` (danh sách lỗi nếu có)
+    - `isLoading: boolean`
+    - `availablePhysicalCopy: PhysicalBook | null` (physical copy đầu tiên trong mảng available)
+
+### 5. Cập nhật Book Detail Page
+
+#### 5.1. Cập nhật `src/pages/document/[bookId]/page.tsx`
+
+- [ ] Import hook `useBookBorrowValidation`
+- [ ] Sử dụng hook để kiểm tra điều kiện mượn sách
+- [ ] Xử lý logic hiển thị:
+    - Nếu `book_type === 'ebook'`: Hiển thị giao diện đọc sách (ebook reader)
+    - Nếu `book_type === 'physical'` và `physical_type === 'library_use'`: Hiển thị alert "Sách chỉ được đọc ở thư viện"
+    - Nếu `book_type === 'physical'` và `physical_type === 'borrowable'`:
+        - Kiểm tra validation từ hook
+        - Nếu có lỗi: Hiển thị alert với danh sách lỗi (sử dụng Alert component từ shadcn)
+        - Nếu pass: Hiển thị giao diện mượn sách
+- [ ] Khi người dùng nhấn nút "Mượn sách":
+    - Nếu pass validation: Console.log physical available đầu tiên trong mảng
+    - Nếu không pass: Hiển thị toast error với danh sách lỗi (sử dụng sonner)
+
+### 6. Tạo/Cập nhật Components
+
+#### 6.1. Tạo `src/components/ui/alert.tsx` (nếu chưa có)
+
+- [ ] Tạo Alert component từ shadcn/ui
+- [ ] Bao gồm: `Alert`, `AlertTitle`, `AlertDescription`, `AlertIcon`
+
+#### 6.2. Tạo `src/features/document/[bookId]/components/book-borrow-form.tsx` (mới)
+
+- [ ] Component form mượn sách
+- [ ] Hiển thị thông tin:
+    - Thông tin sách (đã có trong BookDetailPage)
+    - Thông tin độc giả
+    - Ngày mượn
+    - Hạn trả (dựa vào borrowDurationDays của readerType)
+- [ ] Button "Mượn sách" với logic xử lý
+
+#### 6.3. Tạo `src/features/document/[bookId]/components/book-borrow-alert.tsx` (mới)
+
+- [ ] Component hiển thị alert khi không đủ điều kiện mượn sách
+- [ ] Sử dụng Alert component từ shadcn
+- [ ] Hiển thị danh sách lỗi từ validation
+
+#### 6.4. Tạo `src/features/document/[bookId]/components/ebook-reader.tsx` (mới, nếu cần)
+
+- [ ] Component hiển thị giao diện đọc sách điện tử
+- [ ] Chỉ hiển thị khi `book_type === 'ebook'`
+
+### 7. Xử lý Date và Validation
+
+#### 7.1. Tạo utility function `src/lib/date-utils.ts` (nếu chưa có)
+
+- [ ] Function `isCardExpired(cardExpiryDate: string): boolean`
+- [ ] Function `formatDate(date: string | Date): string`
+- [ ] Function `calculateDueDate(borrowDate: Date, durationDays: number): Date`
+
+### 8. Testing và Error Handling
+
+#### 8.1. Xử lý Error States
+
+- [ ] Xử lý loading state khi fetch data
+- [ ] Xử lý error state khi API call fail
+- [ ] Hiển thị error messages phù hợp cho user
+
+#### 8.2. Toast Notifications
+
+- [ ] Sử dụng `toast` từ `sonner` để hiển thị:
+    - Success message khi validation pass
+    - Error messages khi validation fail
+    - Warning message khi sách chỉ được đọc ở thư viện
+
+### 9. Cập nhật Routes (nếu cần)
+
+#### 9.1. Kiểm tra `src/routes.tsx`
+
+- [ ] Đảm bảo route `/documents/:bookId` đã được định nghĩa đúng
+- [ ] Route đã trỏ đến `src/pages/document/[bookId]/page.tsx`
+
+### 10. Code Quality và Best Practices
+
+#### 10.1. Tuân thủ quy tắc chung
+
+- [ ] Tất cả file và folder tuân thủ kebab-case
+- [ ] Sử dụng `cn()` utility cho className có điều kiện
+- [ ] Import order đúng theo quy tắc
+- [ ] TypeScript types đầy đủ, không sử dụng `any`
+
+#### 10.2. Component Structure
+
+- [ ] Tách logic validation vào custom hook
+- [ ] Components trong `features/` directory
+- [ ] Pages chỉ chứa layout và routing logic
+
+## Checklist tổng hợp
+
+### Phase 1: Types và Enums
+
+- [ ] Định nghĩa enum cho AccountStatus
+- [ ] Định nghĩa enum cho ReaderStatus/isActive
+- [ ] Tạo types cho BorrowRecord
+- [ ] Định nghĩa enum cho BorrowRecordStatus
+- [ ] Định nghĩa enum cho PhysicalCopyStatus
+- [ ] Tạo type cho PhysicalCopyAvailableResponse
+
+### Phase 2: APIs
+
+- [ ] Tạo borrow-record.api.ts
+- [ ] Cập nhật physical-copies.api.ts với API available
+
+### Phase 3: Hooks
+
+- [ ] Tạo useGetBorrowRecordsByStatus hook
+- [ ] Tạo useGetAvailablePhysicalCopies hook
+- [ ] Tạo useBookBorrowValidation hook (logic chính)
+
+### Phase 4: Components
+
+- [ ] Tạo Alert component (nếu chưa có)
+- [ ] Tạo BookBorrowForm component
+- [ ] Tạo BookBorrowAlert component
+- [ ] Tạo EbookReader component (nếu cần)
+
+### Phase 5: Page Logic
+
+- [ ] Cập nhật BookDetailPage với validation logic
+- [ ] Xử lý hiển thị theo book_type và physical_type
+- [ ] Xử lý button "Mượn sách" với console.log
+
+### Phase 6: Utilities
+
+- [ ] Tạo date-utils.ts với các helper functions
+
+### Phase 7: Testing
+
+- [ ] Test validation logic với các trường hợp khác nhau
+- [ ] Test error handling
+- [ ] Test UI/UX flow
+
+## Lưu ý quan trọng
+
+1. **Thứ tự thực hiện**: Luôn tuân theo workflow: Types → APIs → Hooks → Components → Pages
+2. **Validation Logic**: Tất cả logic validation nên được tập trung trong hook `useBookBorrowValidation`
+3. **Error Messages**: Tất cả error messages phải rõ ràng và thân thiện với người dùng
+4. **Loading States**: Luôn hiển thị loading state khi fetch data
+5. **Console.log**: Khi pass validation và người dùng nhấn "Mượn sách", console.log physical available đầu tiên trong mảng
+6. **Shadcn Components**: Sử dụng Alert, Sonner (toast), Card từ shadcn/ui
+7. **Enum Definitions**: Tất cả status, isActive phải được định nghĩa bằng enum trong types
