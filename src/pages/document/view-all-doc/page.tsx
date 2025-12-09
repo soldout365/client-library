@@ -1,7 +1,7 @@
-import { BooksGrid } from './components/BooksGrid'
-import { CategorySidebar } from './components/CategorySidebar'
-import { DocumentBreadcrumb } from './components/DocumentBreadcrumb'
-import { DocumentSearchBar } from './components/DocumentSearchBar'
+import { BooksGrid } from '@/features/document/view-all-doc/components/books-grid'
+import { CategorySidebar } from '@/features/document/view-all-doc/components/category-sidebar'
+import { DocumentBreadcrumb } from '@/features/document/view-all-doc/components/document-breadcrumb'
+import { DocumentSearchBar } from '@/features/document/view-all-doc/components/document-search-bar'
 import { Header } from '@/components/header'
 import { useQueryParams } from '@/hooks/useQueryParam'
 

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useUserInfo } from '@/hooks/user/useGetInfoCurUser'
 import { useAuthStore } from '@/stores/auth.store'
 import { toast } from 'sonner'
-import ReaderDetailModal from '@/pages/user-info/components/detail-info'
+import ReaderDetailModal from '@/features/user-info/components/detail-info'
 
 export default function UserInfoPage() {
 	const navigate = useNavigate()

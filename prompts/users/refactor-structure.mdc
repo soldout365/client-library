@@ -1,0 +1,43 @@
+---
+alwaysApply: true
+---
+
+bạn hãy chỉnh lại các file trong src/pages theo dạng structure page.tsx
+ex:
+├── 📁 pages
+│ │ ├── 📁 authentication
+│ │ │ ├── 📁 change-password
+│ │ │ │ └── 📄 page.tsx
+│ │ │ ├── 📁 forgot-password
+│ │ │ │ └── 📄 page.tsx
+│ │ │ ├── 📁 login
+│ │ │ │ └── 📄 page.tsx
+│ │ │ ├── 📁 register
+│ │ │ │ └── 📄 page.tsx
+│ │ │ └── 📁 reset-password
+│ │ │ └── 📄 page.tsx
+│ │ ├── 📁 document
+│ │ │ ├── 📁 components
+│ │ │ │ ├── 📄 BookCard.tsx
+│ │ │ │ ├── 📄 BookDetailPage.tsx -> chuyển sang page.tsx và move sang 1 page mới theo dang /pages/documents/[id]/page.tsx
+│ │ │ │ └── 📄 BookSection.tsx
+│ │ │ ├── 📁 view-all-doc
+│ │ │ │ ├── 📁 components
+│ │ │ │ │ ├── 📄 BooksGrid.tsx
+│ │ │ │ │ ├── 📄 CategorySidebar.tsx
+│ │ │ │ │ ├── 📄 DocumentBreadcrumb.tsx
+│ │ │ │ │ └── 📄 DocumentSearchBar.tsx
+│ │ │ │ └── 📄 page.tsx
+│ │ │ └── 📄 page.tsx
+│ │ ├── 📁 home
+│ │ │ └── 📄 home.tsx -> page.tsx
+│ │ └── 📁 user-info
+│ │ ├── 📁 components
+│ │ │ └── 📄 detail-info.tsx
+│ │ └── 📄 page.tsx
+
+và routes (src/routes.tsx) sẽ điều chỉnh tương ứng
+
+---
+
+sau khi chỉnh xong, bạn hãy tách các components của các page sang feature và structure feature sẽ tương ứng như page, nhưng chỉ có chức năng chứa component, hooks, utils,... của page đó

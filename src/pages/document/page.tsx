@@ -1,9 +1,9 @@
+import { Header } from '@/components/header'
+import { BookSection } from '@/features/document/components/book-section'
 import { useBooks } from '@/hooks/books/useGetBooks'
 import { useQueryParams } from '@/hooks/useQueryParam'
 import { EBookType, type BookQueryParamsType } from '@/types/book.type'
 import { createSearchParams, useNavigate } from 'react-router-dom'
-import { BookSection } from './components/BookSection'
-import { Header } from '@/components/header'
 
 const DocumentPage = () => {
 	const navigate = useNavigate()
@@ -31,9 +31,9 @@ const DocumentPage = () => {
 			<Header />
 
 			{/* Main Content */}
-			<main className='max-w-7xl mx-auto px-4 py-8'>
+			<main className='px-4 py-8 mx-auto max-w-7xl'>
 				{isBookLoading ? (
-					<div className='flex justify-center items-center h-64'>
+					<div className='flex items-center justify-center h-64'>
 						<div className='text-gray-500'>Đang tải...</div>
 					</div>
 				) : (

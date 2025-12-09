@@ -1,18 +1,18 @@
 import { createBrowserRouter } from 'react-router-dom'
-import LoginPage from './pages/authentication/login/page'
-import PublicRouter from './components/PublicRouter'
-import PrivateRouter from './components/PrivateRouter'
+import PrivateRouter from './components/private-router'
+import PublicRouter from './components/public-router'
+import RootLayout from './layouts/root-layout'
 import ChangePassPage from './pages/authentication/change-password/page'
 import ForgotPassPage from './pages/authentication/forgot-password/page'
-import ResetPassPage from './pages/authentication/reset-password/page'
-import Dashboard from './pages/home/home'
-
-import UserInfoPage from './pages/user-info/page'
+import LoginPage from './pages/authentication/login/page'
 import RegisterPage from './pages/authentication/register/page'
-import RootLayout from './layouts/RootLayout'
+import ResetPassPage from './pages/authentication/reset-password/page'
+import BookDetailPage from './pages/document/[bookId]/page'
 import DocumentPage from './pages/document/page'
 import ViewAllDocumentPage from './pages/document/view-all-doc/page'
-import BookDetailPage from './pages/document/components/BookDetailPage'
+import Dashboard from './pages/home/page'
+import UserInfoPage from './pages/user-info/page'
+
 const routes = createBrowserRouter([
 	{
 		path: '/login',

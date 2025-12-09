@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import type { BookType } from '@/types/book.type'
-import { BookCard } from './BookCard'
+import { BookCard } from './book-card'
 
 interface BookSectionProps {
 	title: string

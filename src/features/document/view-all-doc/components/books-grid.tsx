@@ -1,6 +1,6 @@
 import { createSearchParams, useNavigate } from 'react-router-dom'
 
-import { BookCard } from '../../components/BookCard'
+import { BookCard } from '@/features/document/components/book-card'
 import type { BookQueryParamsType } from '@/types/book.type'
 import PaginationWrapper from '@/components/pagination-wrapper'
 import { useBooks } from '@/hooks/books/useGetBooks'
