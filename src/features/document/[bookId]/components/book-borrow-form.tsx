@@ -1,13 +1,12 @@
-import { Button } from '@/components/ui/button'
+import { AlertCircle, Calendar, Clock, Hash, User } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Calendar, User, Hash, Clock, AlertCircle } from 'lucide-react'
-import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
-import { formatDate, calculateDueDate } from '@/lib/date-utils'
-import type { Reader } from '@/types/reader.type'
+import { calculateDueDate, formatDate, getTomorrowDate } from '@/lib/date-utils'
+
 import type { BookType } from '@/types/book.type'
-import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
 import type { PhysicalBook } from '@/types/physical-copies.type'
+import type { Reader } from '@/types/reader.type'
+import { useCreateReservation } from '@/hooks/reservations/useCreateReservation'
 
 interface BookBorrowFormProps {
 	book: BookType
@@ -17,26 +16,46 @@ interface BookBorrowFormProps {
 	onCancel: () => void
 }
 
-export const BookBorrowForm = ({
-	book,
-	reader,
-	availablePhysicalCopy,
-	onBorrow,
-	onCancel
-}: BookBorrowFormProps) => {
+export const BookBorrowForm = ({ book, reader, availablePhysicalCopy, onBorrow, onCancel }: BookBorrowFormProps) => {
 	const borrowDate = new Date()
-	const dueDate = reader
-		? calculateDueDate(borrowDate, reader.readerType.borrowDurationDays)
-		: new Date()
+	const dueDate = reader ? calculateDueDate(borrowDate, reader.readerType.borrowDurationDays) : new Date()
+	const createReservationMutation = useCreateReservation()
 
 	const handleBorrow = () => {
-		if (availablePhysicalCopy) {
-			console.log('Physical available đầu tiên:', availablePhysicalCopy)
-			toast.success('Đã ghi nhận yêu cầu mượn sách')
-			onBorrow()
-		} else {
-			toast.error('Không tìm thấy sách có sẵn')
+		if (!availablePhysicalCopy) {
+			return
 		}
+
+		if (!reader) {
+			return
+		}
+
+		// Tính toán reservation_date (ngày hôm nay)
+		const reservationDate = new Date()
+
+		// Tính toán expiry_date (ngày mai)
+		const expiryDate = getTomorrowDate(reservationDate)
+
+		// Tạo reader_notes theo format yêu cầu
+		const readerNotes = `${reader.cardNumber} - ${reader.fullName} muốn mượn sách ${book.title} - ${book.isbn}`
+
+		// Chuẩn bị payload
+		const payload = {
+			reader_id: reader.id,
+			book_id: book.id,
+			physical_copy_id: availablePhysicalCopy.id,
+			reservation_date: reservationDate.toISOString(),
+			expiry_date: expiryDate.toISOString(),
+			reader_notes: readerNotes,
+			priority: 1
+		}
+
+		// Gọi API
+		createReservationMutation.mutate(payload, {
+			onSuccess: () => {
+				onBorrow()
+			}
+		})
 	}
 
 	return (
@@ -44,50 +63,50 @@ export const BookBorrowForm = ({
 			<CardContent className='p-6'>
 				{/* Thông tin mượn sách */}
 				<div className='mb-6'>
-					<h3 className='font-bold text-gray-900 mb-4 text-lg'>Thông tin mượn sách</h3>
+					<h3 className='mb-4 text-lg font-bold text-gray-900'>Thông tin mượn sách</h3>
 
-					<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+					<div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
 						{/* Họ tên độc giả */}
-						<div className='flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200'>
+						<div className='flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50'>
 							<User className='w-5 h-5 text-gray-600' />
 							<div className='flex-1'>
-								<label className='text-sm text-gray-600 block'>Họ tên độc giả</label>
-								<p className='text-gray-900 font-medium'>{reader?.fullName || 'N/A'}</p>
+								<label className='block text-sm text-gray-600'>Họ tên độc giả</label>
+								<p className='font-medium text-gray-900'>{reader?.fullName || 'N/A'}</p>
 							</div>
 						</div>
 
 						{/* Số thẻ thư viện */}
-						<div className='flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200'>
+						<div className='flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50'>
 							<Hash className='w-5 h-5 text-gray-600' />
 							<div className='flex-1'>
-								<label className='text-sm text-gray-600 block'>Số thẻ thư viện</label>
-								<p className='text-gray-900 font-medium'>{reader?.cardNumber || 'N/A'}</p>
+								<label className='block text-sm text-gray-600'>Số thẻ thư viện</label>
+								<p className='font-medium text-gray-900'>{reader?.cardNumber || 'N/A'}</p>
 							</div>
 						</div>
 
 						{/* Ngày mượn */}
-						<div className='flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200'>
+						<div className='flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50'>
 							<Calendar className='w-5 h-5 text-gray-600' />
 							<div className='flex-1'>
-								<label className='text-sm text-gray-600 block'>Ngày mượn</label>
-								<p className='text-gray-900 font-medium'>{formatDate(borrowDate)}</p>
+								<label className='block text-sm text-gray-600'>Ngày mượn</label>
+								<p className='font-medium text-gray-900'>{formatDate(borrowDate)}</p>
 							</div>
 						</div>
 
 						{/* Hạn trả */}
-						<div className='flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200'>
+						<div className='flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50'>
 							<Clock className='w-5 h-5 text-gray-600' />
 							<div className='flex-1'>
-								<label className='text-sm text-gray-600 block'>Hạn trả</label>
-								<p className='text-gray-900 font-medium'>{formatDate(dueDate)}</p>
+								<label className='block text-sm text-gray-600'>Hạn trả</label>
+								<p className='font-medium text-gray-900'>{formatDate(dueDate)}</p>
 							</div>
 						</div>
 					</div>
 				</div>
 
 				{/* Thông tin đặt trước - Blue box */}
-				<div className='bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4'>
-					<h4 className='font-semibold text-blue-900 mb-3 flex items-center gap-2'>
+				<div className='p-4 mb-4 border border-blue-200 rounded-lg bg-blue-50'>
+					<h4 className='flex items-center gap-2 mb-3 font-semibold text-blue-900'>
 						<AlertCircle className='w-5 h-5' />
 						Thông tin đặt trước:
 					</h4>
@@ -101,8 +120,8 @@ export const BookBorrowForm = ({
 				</div>
 
 				{/* Điều khoản mượn sách - Yellow box */}
-				<div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6'>
-					<h4 className='font-semibold text-yellow-900 mb-3'>Điều khoản mượn sách:</h4>
+				<div className='p-4 mb-6 border border-yellow-200 rounded-lg bg-yellow-50'>
+					<h4 className='mb-3 font-semibold text-yellow-900'>Điều khoản mượn sách:</h4>
 					<ul className='space-y-1.5 text-sm text-yellow-800'>
 						<li>• Sách phải được trả đúng hạn</li>
 						<li>• Giữ gìn sách cẩn thận, không làm hư hỏng</li>
@@ -113,11 +132,15 @@ export const BookBorrowForm = ({
 
 				{/* Action Buttons */}
 				<div className='flex justify-end gap-3'>
-					<Button variant='outline' onClick={onCancel}>
+					<Button variant='outline' onClick={onCancel} disabled={createReservationMutation.isPending}>
 						Hủy
 					</Button>
-					<Button className='bg-green-600 hover:bg-green-700' onClick={handleBorrow}>
-						Mượn sách
+					<Button
+						className='bg-green-600 hover:bg-green-700'
+						onClick={handleBorrow}
+						disabled={createReservationMutation.isPending || !availablePhysicalCopy || !reader}
+					>
+						{createReservationMutation.isPending ? 'Đang xử lý...' : 'Mượn sách'}
 					</Button>
 				</div>
 			</CardContent>

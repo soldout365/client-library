@@ -1,0 +1,58 @@
+---
+alwaysApply: true
+---
+
+khi nguời dùng nhấn mượn sách ở src/pages/document/[bookId]/page.tsx thì sẽ call đến api `/api/reservations`, với body
+
+```json
+{
+	"reader_id": "550e8400-e29b-41d4-a716-446655440000",
+	"book_id": "550e8400-e29b-41d4-a716-446655440000",
+	"physical_copy_id": "550e8400-e29b-41d4-a716-446655440000",
+	"reservation_date": "2024-01-01T10:00:00.000Z",
+	"expiry_date": "2024-01-08T10:00:00.000Z",
+	"reader_notes": "Cần sách này cho nghiên cứu",
+	"priority": 1
+}
+```
+
+và response khi nhận về sẽ là:
+
+```json
+{
+	"id": "550e8400-e29b-41d4-a716-446655440000",
+	"reader_id": "550e8400-e29b-41d4-a716-446655440000",
+	"book_id": "550e8400-e29b-41d4-a716-446655440000",
+	"physical_copy_id": "550e8400-e29b-41d4-a716-446655440000",
+	"reservation_date": "2024-01-01T10:00:00.000Z",
+	"expiry_date": "2024-01-08T10:00:00.000Z",
+	"status": "pending",
+	"reader_notes": "Cần sách này cho nghiên cứu",
+	"librarian_notes": "Sách sẽ có sau 3 ngày",
+	"fulfillment_date": "2024-01-05T10:00:00.000Z",
+	"fulfilled_by": "550e8400-e29b-41d4-a716-446655440000",
+	"cancelled_date": "2024-01-03T10:00:00.000Z",
+	"cancellation_reason": "Không còn cần thiết",
+	"cancelled_by": "550e8400-e29b-41d4-a716-446655440000",
+	"priority": 1,
+	"created_at": "2024-01-01T00:00:00.000Z",
+	"updated_at": "2024-01-01T00:00:00.000Z"
+}
+```
+
+lưu ý: reservation_date là ngày mượn hôm nay, expiry_date là ngày hôm sau
+reader_notes thì gán mặc định message là: {cardNumber} - {fullName} muốn mượn sách {bookTitle} - {isbn}
+
+khi call api đặt trước thành công, thì cũng phải update lại status của sách cuốn sách vật lý đó sang `reserved`
+api update lại sách physical-copies là:
+`/physical-copies/{id}/status`
+Request body
+
+```json
+{
+	"status": "available",
+	"notes": "string"
+}
+```
+
+status của physical-copies có 3 loại: available, borrowed, reserved, damaged, lost, maintenaince

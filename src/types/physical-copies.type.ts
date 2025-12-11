@@ -84,3 +84,8 @@ export type CreatePhysicalBookReq = Pick<
 	| 'last_checkup_date'
 	| 'is_archived'
 >
+
+export type UpdatePhysicalCopyStatusRequest = {
+	status: 'available' | 'borrowed' | 'reserved' | 'damaged' | 'lost' | 'maintenance'
+	notes?: string
+}

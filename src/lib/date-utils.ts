@@ -18,3 +18,9 @@ export const calculateDueDate = (borrowDate: Date, durationDays: number): Date =
 	dueDate.setDate(dueDate.getDate() + durationDays)
 	return dueDate
 }
+
+export const getTomorrowDate = (date: Date): Date => {
+	const tomorrow = new Date(date)
+	tomorrow.setDate(tomorrow.getDate() + 1)
+	return tomorrow
+}

@@ -2,17 +2,17 @@ import { Card, CardContent } from '@/components/ui/card'
 import { EBookType, EPhysicalType } from '@/types/book.type'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { Header } from '@/components/header'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { BookBorrowAlert } from '@/features/document/[bookId]/components/book-borrow-alert'
 import { BookBorrowForm } from '@/features/document/[bookId]/components/book-borrow-form'
+import { Button } from '@/components/ui/button'
+import { ChevronLeft } from 'lucide-react'
+import { Header } from '@/components/header'
 import { LibraryUseAlert } from '@/features/document/[bookId]/components/library-use-alert'
 import { useBookBorrowValidation } from '@/hooks/books/useBookBorrowValidation'
 import { useGetBookById } from '@/hooks/books/useGetBooks'
 import { useGetReaderByUserId } from '@/hooks/reader/useGetReaderByUserId'
 import { useUserInfo } from '@/hooks/user/useGetInfoCurUser'
-import { ChevronLeft } from 'lucide-react'
 
 const BookDetailPage = () => {
 	const { bookId } = useParams<{ bookId: string }>()
@@ -20,7 +20,6 @@ const BookDetailPage = () => {
 	const { data: book, isLoading } = useGetBookById(bookId)
 	const { userInfo } = useUserInfo()
 	const { data: reader } = useGetReaderByUserId(userInfo?.id || '')
-	console.log('🚀 ~ BookDetailPage ~ reader:', reader)
 
 	const validation = useBookBorrowValidation({
 		bookId,
@@ -48,6 +47,11 @@ const BookDetailPage = () => {
 				</div>
 			</div>
 		)
+	}
+
+	const handleBorrow = () => {
+		console.log('Mượn sách')
+		navigate(-1)
 	}
 
 	// Xử lý logic hiển thị theo book_type và physical_type
@@ -118,10 +122,7 @@ const BookDetailPage = () => {
 							book={book}
 							reader={reader}
 							availablePhysicalCopy={validation.availablePhysicalCopy}
-							onBorrow={() => {
-								// Logic xử lý mượn sách sẽ được thêm sau
-								navigate(-1)
-							}}
+							onBorrow={handleBorrow}
 							onCancel={() => navigate(-1)}
 						/>
 					</div>
@@ -198,7 +199,9 @@ const BookDetailPage = () => {
 									<div className='flex items-start gap-2'>
 										<span className='text-gray-500 w-[100px]'>Số lượng:</span>
 										<span className='flex-1 font-medium text-gray-900'>
-											{book.book_type === EBookType.PHYSICAL ? '1 cuốn' : 'Không giới hạn'}
+											{book.book_type === EBookType.PHYSICAL
+												? `${validation.totalAvailable || 0} cuốn`
+												: 'Không giới hạn'}
 										</span>
 									</div>
 								</div>
